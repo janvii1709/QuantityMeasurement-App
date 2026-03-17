@@ -1,5 +1,5 @@
 package com.example.QunatityApps;
-public class UnitConversion {
+public class UnitAddition {
 
     enum LengthUnit {
         INCHES(1.0),
@@ -34,7 +34,6 @@ public class UnitConversion {
             this.unit = unit;
         }
 
-        // STATIC CONVERT METHOD (UC5)
         public static double convert(double value, LengthUnit source, LengthUnit target) {
 
             validate(value, source);
@@ -42,18 +41,32 @@ public class UnitConversion {
             if(target == null) {
                 throw new IllegalArgumentException("Target unit cannot be null");
             }
-            
-            if(source == target) {
-            	return value;
-            }
 
-            double baseValue = source.toBase(value);
-            return target.fromBase(baseValue);
+            double base = source.toBase(value);
+            return target.fromBase(base);
         }
 
         public QuantityLength convertTo(LengthUnit target) {
-            double convertedValue = convert(this.value, this.unit, target);
-            return new QuantityLength(convertedValue, target);
+            return new QuantityLength(convert(this.value, this.unit, target), target);
+        }
+
+        public QuantityLength add(QuantityLength other) {
+
+            if(other == null) {
+                throw new IllegalArgumentException("Second operand cannot be null");
+            }
+
+            // Converting both to base
+            double base1 = this.unit.toBase(this.value);
+            double base2 = other.unit.toBase(other.value);
+
+            // Adding in base
+            double sumBase = base1 + base2;
+
+            // Converting back to first operand unit
+            double result = this.unit.fromBase(sumBase);
+
+            return new QuantityLength(result, this.unit);
         }
 
         private static void validate(double value, LengthUnit unit) {
@@ -66,6 +79,9 @@ public class UnitConversion {
             }
         }
 
+        public double getValue() { return value; }
+        public LengthUnit getUnit() { return unit; }
+
         @Override
         public boolean equals(Object obj) {
             if(this == obj) {
@@ -76,10 +92,10 @@ public class UnitConversion {
             	return false;
             }
 
-            double thisBase = unit.toBase(value);
-            double otherBase = other.unit.toBase(other.value);
+            double base1 = unit.toBase(value);
+            double base2 = other.unit.toBase(other.value);
 
-            return Math.abs(thisBase - otherBase) < EPSILON;
+            return Math.abs(base1 - base2) < EPSILON;
         }
 
         @Override
@@ -95,14 +111,9 @@ public class UnitConversion {
 
     public static void main(String[] args) {
 
-        System.out.println("Feet to Inches: " + QuantityLength.convert(1.0, LengthUnit.FEET, LengthUnit.INCHES));
+        QuantityLength q1 = new QuantityLength(1.0, LengthUnit.FEET);
+        QuantityLength q2 = new QuantityLength(12.0, LengthUnit.INCHES);
 
-        System.out.println("Yards to Feet: " + QuantityLength.convert(3.0, LengthUnit.YARDS, LengthUnit.FEET));
-
-        System.out.println("Centimeters to Inches: " + QuantityLength.convert(1.0, LengthUnit.CENTIMETERS, LengthUnit.INCHES));
-
-        QuantityLength length = new QuantityLength(3.0, LengthUnit.YARDS);
-        
-        System.out.println("Instance Convert: " + length.convertTo(LengthUnit.FEET));
+        System.out.println(q1.add(q2)); 
     }
 }
