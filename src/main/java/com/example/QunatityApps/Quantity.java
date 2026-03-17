@@ -83,5 +83,9 @@ public class Quantity<U extends IMeasurable> {
     public String toString() {
         return "Quantity(" + value + ", " + unit.getUnitName() + ")";
     }
+
+	public double getValue() {
+		return 0;
+	}
 }
 
